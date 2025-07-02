@@ -1,7 +1,5 @@
 FROM fedora:42
 
-ENV HOME=/home/distrobox
-
 # Import Microsoft GPG key and add VSCode repo
 RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc
 COPY vscode.repo /etc/yum.repos.d/vscode.repo
@@ -44,12 +42,9 @@ RUN chsh -s /usr/bin/fish && \
         fzf'
 
 # Install Rust
-ENV RUSTUP_HOME=$HOME/.rustup
-ENV CARGO_HOME=$HOME/.cargo
-ENV PATH="$PATH:$CARGO_HOME/bin"
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
-RUN cargo install cargo-binstall
-RUN cargo binstall \
+RUN ~/.cargo/bin/cargo install cargo-binstall
+RUN ~/.cargo/bin/cargo binstall \
         cargo-run-bin \
         # File and directory operations
         eza du-dust \
@@ -62,8 +57,6 @@ RUN cargo binstall \
         bottom
 
 # Install Bun.js
-ENV BUN_HOME=$HOME/.bun
-ENV PATH="$PATH:$BUN_HOME/bin"
 RUN curl -fsSL https://bun.sh/install | bash
 
 # Install Nerd Fonts
