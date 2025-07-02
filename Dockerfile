@@ -1,5 +1,7 @@
 FROM fedora:42
 
+ENV HOME=/opt/distrobox_home
+
 # Import Microsoft GPG key and add VSCode repo
 RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc
 COPY vscode.repo /etc/yum.repos.d/vscode.repo
@@ -27,8 +29,7 @@ RUN dnf5 install -y \
       util-linux dnf-plugins-core unzip wayland-devel wayland-protocols-devel podman podman-compose
 
 # Set up fish shell and fisher plugins
-RUN chsh -s /usr/bin/fish && \
-    fish -c 'curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher' && \
+RUN fish -c 'curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher' && \
     fish -c ' \
       fisher install \
         oh-my-fish/theme-bobthefish \
@@ -72,7 +73,3 @@ RUN mkdir -p /opt/jetbrains-toolbox && \
 
 # Install AstroNvim
 RUN git clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim
-
-COPY dotfiles/ $HOME/
-
-ENTRYPOINT [ "fish" ]
