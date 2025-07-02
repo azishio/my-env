@@ -42,21 +42,26 @@ RUN chsh -s /usr/bin/fish && \
         fzf'
 
 # Install Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-RUN ~/.cargo/bin/cargo install cargo-binstall
-RUN ~/.cargo/bin/cargo binstall \
-    cargo-run-bin \
-    # File and directory operations
-    eza du-dust \
-    # Terminal and shell \
-    starship \
-    # CLI utilities
-    xplr \
-    gping \
-    # Resource and process monitors
-    bottom
+ENV RUSTUP_HOME=${HOME}/.rustup
+ENV CARGO_HOME=${HOME}/.cargo
+ENV PATH="${PATH}:${CARGO_HOME}/bin"
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+RUN cargo install cargo-binstall
+RUN cargo binstall \
+        cargo-run-bin \
+        # File and directory operations
+        eza du-dust \
+        # Terminal and shell \
+        starship \
+        # CLI utilities
+        xplr \
+        gping \
+        # Resource and process monitors
+        bottom
 
 # Install Bun.js
+ENV BUN_HOME=$HOME/.bun
+ENV PATH="$PATH:$BUN_HOME/bin"
 RUN curl -fsSL https://bun.sh/install | bash
 
 # Install Nerd Fonts
@@ -72,3 +77,7 @@ RUN mkdir -p /opt/jetbrains-toolbox && \
 
 # Install AstroNvim
 RUN git clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim
+
+COPY dotfiles/ $HOME/
+
+ENTRYPOINT [ "fish" ]
