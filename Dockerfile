@@ -1,7 +1,5 @@
 FROM fedora:42
 
-ENV HOME=/opt/distrobox_home
-
 # Import Microsoft GPG key and add VSCode repo
 RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc
 COPY vscode.repo /etc/yum.repos.d/vscode.repo
@@ -26,7 +24,9 @@ RUN dnf5 install -y \
       # TUI multiplexer
       zellij \
       # Other build and dev dependencies
-      util-linux dnf-plugins-core unzip wayland-devel wayland-protocols-devel podman podman-compose
+      util-linux dnf-plugins-core unzip wayland-devel wayland-protocols-devel podman podman-compose \
+      # Languages
+      rust cargo clippy rustfmt rust-src
 
 # Set up fish shell and fisher plugins
 RUN fish -c 'curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher' && \
@@ -43,9 +43,8 @@ RUN fish -c 'curl -sL https://git.io/fisher | source && fisher install jorgebuca
         fzf'
 
 # Install Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
-RUN ~/.cargo/bin/cargo install cargo-binstall
-RUN ~/.cargo/bin/cargo binstall \
+RUN cargo install cargo-binstall
+RUN cargo binstall \
         cargo-run-bin \
         # File and directory operations
         eza du-dust \
@@ -58,7 +57,7 @@ RUN ~/.cargo/bin/cargo binstall \
         bottom
 
 # Install Bun.js
-RUN curl -fsSL https://bun.sh/install | bash
+# RUN curl -fsSL https://bun.sh/install | bash
 
 # Install Nerd Fonts
 RUN mkdir -p /usr/share/fonts/distrobox_nerd && \
